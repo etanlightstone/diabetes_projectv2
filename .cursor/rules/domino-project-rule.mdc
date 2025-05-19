@@ -11,4 +11,4 @@ When running a job, always check its status and results if completed and briefly
 
 Any requests related to understanding or manipulating project data should assume a dataset file is already part of the domino project and accessible via job runs. Always create scripts to understand and transform data via job runs. The script can assume all project data is accessible under the '/mnt/data/' directory or the '/mnt/imported/data/' directory, be sure to understand the full path to a dataset file before using it by running a job to list all folder contents recursively. Analytical outputs should be in plain text tabular format sent to stdout, this makes it easier to check results from the job run.
 
-If the project has uncommitted changes, you must commit and push changes before attempting to run any domino jobs.
+Always check if our local project has uncommitted changes, you must commit and push changes before attempting to run any domino jobs otherwise domino can't see the new file changes.

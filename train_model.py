@@ -55,14 +55,54 @@ def parse_args():
 
 def load_data(data_dir):
     """Load and prepare the training and testing data."""
-    train_data = pd.read_csv(os.path.join(data_dir, 'diabetes_train.csv'))
-    test_data = pd.read_csv(os.path.join(data_dir, 'diabetes_test.csv'))
+    print(f"Loading data from {data_dir}...")
+    
+    # Check if files exist first
+    train_file = os.path.join(data_dir, 'diabetes_train.csv')
+    test_file = os.path.join(data_dir, 'diabetes_test.csv')
+    
+    if not os.path.exists(train_file) or not os.path.exists(test_file):
+        print(f"Train file exists: {os.path.exists(train_file)}")
+        print(f"Test file exists: {os.path.exists(test_file)}")
+        print("Listing directory contents:")
+        for root, dirs, files in os.walk(data_dir):
+            for file in files:
+                print(f"- {os.path.join(root, file)}")
+        raise FileNotFoundError(f"Could not find required data files in {data_dir}")
+    
+    # Load data
+    train_data = pd.read_csv(train_file)
+    test_data = pd.read_csv(test_file)
+    
+    print(f"Train data shape: {train_data.shape}")
+    print(f"Test data shape: {test_data.shape}")
+    
+    # Get column dtypes before processing
+    print("Train data column types:")
+    for col in train_data.columns:
+        print(f"- {col}: {train_data[col].dtype}")
+    
+    # Make sure all data is numeric before converting to tensors
+    # First, handle any categorical columns by checking if they need conversion
+    for col in train_data.columns:
+        if train_data[col].dtype == 'object':
+            print(f"Converting column {col} from object type to numeric")
+            # For categorical columns, convert to category codes
+            train_data[col] = pd.to_numeric(train_data[col], errors='coerce')
+            test_data[col] = pd.to_numeric(test_data[col], errors='coerce')
+    
+    # Fill any NaN values that might have been created
+    train_data = train_data.fillna(0)
+    test_data = test_data.fillna(0)
     
     # Split into features and target
-    X_train = train_data.drop('is_diabetic', axis=1).values
-    y_train = train_data['is_diabetic'].values
-    X_test = test_data.drop('is_diabetic', axis=1).values
-    y_test = test_data['is_diabetic'].values
+    X_train = train_data.drop('is_diabetic', axis=1).astype(np.float32).values
+    y_train = train_data['is_diabetic'].astype(np.float32).values
+    X_test = test_data.drop('is_diabetic', axis=1).astype(np.float32).values
+    y_test = test_data['is_diabetic'].astype(np.float32).values
+    
+    print(f"X_train shape: {X_train.shape}, dtype: {X_train.dtype}")
+    print(f"y_train shape: {y_train.shape}, dtype: {y_train.dtype}")
     
     # Convert to PyTorch tensors
     X_train_tensor = torch.FloatTensor(X_train)
