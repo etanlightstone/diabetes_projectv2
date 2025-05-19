@@ -119,7 +119,9 @@ print(f"Feature names saved to {output_dir}/feature_names.txt")
 
 # 7. Feature importance analysis
 print("\n7. Feature correlation with target...")
-correlations = df.corr()['is_diabetic'].sort_values(ascending=False)
+# Calculate correlations using original numeric features only
+numeric_df = df.select_dtypes(include=['int64', 'float64'])
+correlations = numeric_df.corr()['is_diabetic'].sort_values(ascending=False)
 print(correlations)
 
 # 8. Summary and recommendations
