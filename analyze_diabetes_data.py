@@ -11,6 +11,13 @@ data_paths = ['/mnt/data/', '/mnt/imported/data/']
 
 def find_diabetes_dataset():
     """Search for diabetes dataset in standard Domino data paths."""
+    # First, try the known path where we found the dataset
+    known_path = '/mnt/imported/data/diabetes_datafiles/diabetes_dataset.csv'
+    if os.path.exists(known_path):
+        print(f"\nFound dataset at known path: {known_path}")
+        return known_path
+    
+    # Fallback to searching in standard locations
     possible_filenames = ['diabetes.csv', 'diabetes_data.csv', 'diabetes_dataset.csv']
     
     # Print all available files to help locate the dataset
@@ -21,6 +28,18 @@ def find_diabetes_dataset():
             files = os.listdir(path)
             for file in files:
                 print(f"  - {file}")
+                
+            # Also check subdirectories
+            for file in files:
+                subdir_path = os.path.join(path, file)
+                if os.path.isdir(subdir_path):
+                    print(f"\nFiles in {subdir_path}:")
+                    try:
+                        subdir_files = os.listdir(subdir_path)
+                        for subfile in subdir_files:
+                            print(f"  - {subfile}")
+                    except:
+                        print("  (Unable to list files)")
     
     # Try to find the dataset
     for path in data_paths:
@@ -30,6 +49,26 @@ def find_diabetes_dataset():
                 if os.path.exists(file_path):
                     print(f"\nFound dataset at {file_path}")
                     return file_path
+                
+            # Check subdirectories
+            for file in os.listdir(path):
+                subdir_path = os.path.join(path, file)
+                if os.path.isdir(subdir_path):
+                    for filename in possible_filenames:
+                        file_path = os.path.join(subdir_path, filename)
+                        if os.path.exists(file_path):
+                            print(f"\nFound dataset at {file_path}")
+                            return file_path
+                    
+                    # If exact match not found, look for files containing 'diabetes'
+                    try:
+                        for subfile in os.listdir(subdir_path):
+                            if 'diabetes' in subfile.lower() and subfile.endswith(('.csv', '.xlsx', '.xls')):
+                                file_path = os.path.join(subdir_path, subfile)
+                                print(f"\nFound diabetes-related dataset at {file_path}")
+                                return file_path
+                    except:
+                        pass
                 
             # If exact match not found, look for files containing 'diabetes'
             for file in os.listdir(path):
