@@ -17,6 +17,11 @@ The model is a 4-layer feed-forward neural network with:
 
 ## Running Training Jobs on Domino
 
+Set-up your domino project
+- Clone this repo and use your own github and create a Domino project
+- Add download this csv datafile, add to your project: https://drive.google.com/file/d/1NUyd6LGyMVnSic_DbGHOEKuwZx1WXm0G/view?usp=sharing
+
+
 To train a model on Domino with default parameters:
 
 ```bash
